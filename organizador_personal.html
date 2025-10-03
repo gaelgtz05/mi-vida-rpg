@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Vida RPG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117; /* Negro azulado oscuro */
+            --main-color: #161b22; /* Un poco más claro para los contenedores */
+            --border-color: #30363d; /* Bordes sutiles */
+            --text-color: #c9d1d9; /* Blanco suave */
+            --text-accent-color: #f0f6fc; /* Blanco más brillante para títulos */
+            --accent-color: #388bfd; /* Azul neón brillante */
+            --xp-color: #388bfd;
+            --success-color: #238636;
+            --danger-color: #da3633;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            text-shadow: 2px 2px #00000060;
+            image-rendering: pixelated;
+        }
+
+        .pixel-box {
+            background-color: var(--main-color);
+            border: 4px solid var(--border-color);
+            box-shadow: 6px 6px 0px #000000;
+            padding: 1.5rem;
+        }
+        
+        .pixel-button {
+            background-color: var(--accent-color);
+            border: 4px solid var(--border-color);
+            box-shadow: 4px 4px 0px #000000;
+            padding: 0.75rem 1rem;
+            color: var(--text-accent-color);
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .pixel-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px #000000;
+        }
+        .pixel-button.green { background-color: var(--success-color); }
+        .pixel-button.red { background-color: var(--danger-color); }
+        .pixel-button.yellow { background-color: var(--accent-color); }
+        .pixel-button.gray { background-color: #484f58; }
+
+        input[type="text"], input[type="number"], textarea {
+            font-family: 'Press Start 2P', cursive;
+            background-color: var(--bg-color);
+            border: 4px solid var(--border-color);
+            padding: 0.75rem;
+            color: var(--text-color);
+            width: 100%;
+        }
+        input:focus, textarea:focus { outline: none; border-color: var(--accent-color); }
+
+        .progress-bar-container {
+            background-color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            padding: 4px;
+        }
+        .progress-bar {
+            height: 20px;
+        }
+        
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.8);
+            transition: opacity 0.2s;
+        }
+
+        .tab-button {
+             background-color: #484f58;
+             flex-grow: 1;
+        }
+         .tab-button.active {
+            background-color: var(--accent-color);
+            transform: none;
+            box-shadow: 4px 4px 0px #000000 inset;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        ::-webkit-scrollbar { width: 16px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); border-left: 4px solid var(--border-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border: 4px solid var(--main-color); }
+
+        /* Estilo para checkbox pixelado */
+        .pixel-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background-color: var(--bg-color);
+            border: 3px solid var(--border-color);
+            cursor: pointer;
+            position: relative;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        .pixel-checkbox:checked {
+            background-color: var(--accent-color);
+            border-color: var(--text-accent-color);
+        }
+        .pixel-checkbox:checked::after {
+            content: 'X';
+            color: var(--text-accent-color);
+            position: absolute;
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="container mx-auto max-w-5xl">
+
+        <!-- STATS DEL JUGADOR -->
+        <header class="pixel-box mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-center md:text-left">
+                    <h1 class="text-2xl md:text-3xl text-text-accent-color">MI VIDA RPG</h1>
+                </div>
+                <div class="w-full md:w-2/3 space-y-3">
+                    <!-- Barra de XP -->
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="text-blue-400">PROGRESO:</span>
+                        <div class="progress-bar-container w-full">
+                            <div id="xp-bar" class="progress-bar bg-blue-500" style="width: 0%;"></div>
+                        </div>
+                        <span id="xp-text">0%</span>
+                    </div>
+                    <!-- Saldo -->
+                     <div class="flex items-center gap-2 text-sm">
+                        <span class="text-green-400">SALDO:</span>
+                        <div id="player-balance" class="text-green-400 font-bold">$0.00</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- NAVEGACIÓN PRINCIPAL (TABS) -->
+        <nav class="flex flex-wrap gap-2 mb-4">
+            <button class="tab-button pixel-button active" onclick="showTab('misiones')">Misiones</button>
+            <button class="tab-button pixel-button" onclick="showTab('finanzas')">Finanzas</button>
+            <button class="tab-button pixel-button" onclick="showTab('tienda')">Tienda</button>
+            <button class="tab-button pixel-button" onclick="showTab('armario')">Armario</button>
+        </nav>
+
+        <main>
+            <!-- SECCIÓN MISIONES -->
+            <div id="misiones-tab" class="tab-content active">
+                <div class="pixel-box">
+                    <h2 class="text-xl mb-4 text-center text-text-accent-color">MISIONES DIARIAS</h2>
+                    <div id="mission-list" class="space-y-4 mb-6 max-h-96 overflow-y-auto p-2">
+                        <p class="text-center opacity-50">No hay misiones. ¡Añade una!</p>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="new-mission-input" placeholder="Nueva misión...">
+                        <button class="pixel-button" onclick="addMission()">Aceptar Misión</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN FINANZAS -->
+            <div id="finanzas-tab" class="tab-content">
+                 <div class="pixel-box">
+                     <h2 class="text-xl mb-4 text-center text-text-accent-color">LIBRO DE CUENTAS</h2>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                         <button class="pixel-button green" onclick="openModal('income-modal')">+ Ingreso</button>
+                         <button class="pixel-button red" onclick="openModal('expense-modal')">- Egreso</button>
+                     </div>
+                     <h3 class="text-lg mb-2">Historial:</h3>
+                     <div id="transaction-list" class="space-y-3 text-sm max-h-80 overflow-y-auto border-2 border-dashed border-gray-600 p-2">
+                         <p class="text-center opacity-50">Sin transacciones.</p>
+                     </div>
+                 </div>
+            </div>
+
+            <!-- SECCIÓN TIENDA -->
+            <div id="tienda-tab" class="tab-content">
+                <div class="pixel-box">
+                    <h2 class="text-xl mb-4 text-center text-text-accent-color">TIENDA DE DESEOS</h2>
+                    <div id="store-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                       <!-- Items de la tienda -->
+                    </div>
+                    <button class="pixel-button w-full" onclick="openModal('new-item-modal')">Añadir Objeto a la Tienda</button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN ARMARIO -->
+            <div id="armario-tab" class="tab-content">
+                 <div class="pixel-box">
+                    <h2 class="text-xl mb-6 text-center text-text-accent-color">GUARDARROPA</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div class="lg:col-span-1">
+                            <h3 class="text-lg mb-4">Planificador Semanal</h3>
+                            <div id="weekly-planner" class="space-y-3"></div>
+                        </div>
+                        <div class="lg:col-span-2">
+                             <h3 class="text-lg mb-4">Mi Inventario</h3>
+                             <div id="wardrobe-inventory" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div>
+                             <button class="pixel-button w-full mt-4" onclick="openModal('add-clothing-modal')">Añadir Prenda</button>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALES -->
+    <div id="income-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box w-full max-w-md">
+            <h3 class="text-lg mb-4">Registrar Ingreso</h3>
+            <input type="number" id="income-amount" placeholder="Monto ($)" class="mb-3">
+            <input type="text" id="income-source" placeholder="Origen (ej. Salario)" class="mb-4">
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal('income-modal')" class="pixel-button gray">Cerrar</button>
+                <button onclick="addTransaction('income')" class="pixel-button green">Registrar</button>
+            </div>
+        </div>
+    </div>
+    <div id="expense-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box w-full max-w-md">
+            <h3 class="text-lg mb-4">Registrar Egreso</h3>
+            <input type="number" id="expense-amount" placeholder="Monto ($)" class="mb-3">
+            <input type="text" id="expense-description" placeholder="Descripción (ej. Comida)" class="mb-4">
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal('expense-modal')" class="pixel-button gray">Cerrar</button>
+                <button onclick="addTransaction('expense')" class="pixel-button red">Registrar</button>
+            </div>
+        </div>
+    </div>
+    <div id="new-item-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box w-full max-w-md">
+            <h3 class="text-lg mb-4">Nuevo Objeto para la Tienda</h3>
+            <input type="text" id="item-name" placeholder="Nombre del objeto" class="mb-3">
+            <input type="number" id="item-price" placeholder="Precio ($)" class="mb-4">
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal('new-item-modal')" class="pixel-button gray">Cerrar</button>
+                <button onclick="addStoreItem()" class="pixel-button">Añadir</button>
+            </div>
+        </div>
+    </div>
+    <div id="add-clothing-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box w-full max-w-md">
+            <h3 class="text-lg mb-4">Añadir Prenda al Armario</h3>
+            <input type="text" id="clothing-name" placeholder="Nombre de la prenda" class="mb-3">
+            <input type="text" id="clothing-url" placeholder="URL de la imagen" class="mb-4">
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal('add-clothing-modal')" class="pixel-button gray">Cerrar</button>
+                <button onclick="addWardrobeItem()" class="pixel-button">Añadir</button>
+            </div>
+        </div>
+    </div>
+    <div id="plan-outfit-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
+        <div class="pixel-box w-full max-w-2xl">
+            <h3 class="text-lg mb-4" id="plan-outfit-title">Planificar Outfit para...</h3>
+             <div id="plan-outfit-inventory" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 max-h-80 overflow-y-auto border-2 border-dashed border-gray-600 p-2 mb-4"></div>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal('plan-outfit-modal')" class="pixel-button gray">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+let state = {
+    balance: 0,
+    missions: [],
+    transactions: [],
+    storeItems: [],
+    wardrobe: {
+        clothes: [],
+        outfits: { Lunes: [], Martes: [], Miércoles: [], Jueves: [], Viernes: [], Sábado: [], Domingo: [] }
+    }
+};
+
+// --- DOM SELECTORS ---
+const xpBarEl = document.getElementById('xp-bar');
+const xpTextEl = document.getElementById('xp-text');
+const playerBalanceEl = document.getElementById('player-balance');
+const missionListEl = document.getElementById('mission-list');
+const transactionListEl = document.getElementById('transaction-list');
+const storeListEl = document.getElementById('store-list');
+const wardrobeInventoryEl = document.getElementById('wardrobe-inventory');
+const weeklyPlannerEl = document.getElementById('weekly-planner');
+
+// --- GAME LOGIC ---
+function updateXpBar() {
+    const totalMissions = state.missions.length;
+    if (totalMissions === 0) {
+        xpBarEl.style.width = '0%';
+        xpTextEl.textContent = '0%';
+        return;
+    }
+    const completedMissions = state.missions.filter(m => m.completed).length;
+    const percentage = Math.round((completedMissions / totalMissions) * 100);
+    xpBarEl.style.width = `${percentage}%`;
+    xpTextEl.textContent = `${percentage}%`;
+}
+
+// --- SAVE & LOAD ---
+function saveState() {
+    localStorage.setItem('miVidaRpgState_v2', JSON.stringify(state));
+}
+
+function loadState() {
+    const savedState = localStorage.getItem('miVidaRpgState_v2');
+    if (savedState) {
+        state = JSON.parse(savedState);
+    }
+}
+
+// --- RENDER FUNCTIONS ---
+function render() {
+    renderStats();
+    renderMissions();
+    renderTransactions();
+    renderStore();
+    renderWardrobe();
+    lucide.createIcons();
+}
+
+function renderStats() {
+    playerBalanceEl.textContent = `$${state.balance.toFixed(2)}`;
+    updateXpBar();
+}
+
+function renderMissions() {
+    missionListEl.innerHTML = '';
+    if (state.missions.length === 0) {
+        missionListEl.innerHTML = '<p class="text-center opacity-50">No hay misiones. ¡Añade una!</p>';
+        return;
+    }
+    state.missions.forEach((mission, index) => {
+        const missionEl = document.createElement('div');
+        missionEl.className = `p-3 border-2 ${mission.completed ? 'border-gray-600 opacity-50' : 'border-gray-400'} flex items-center`;
+        missionEl.innerHTML = `
+            <input type="checkbox" id="mission-${index}" class="pixel-checkbox" onchange="toggleMission(${index})" ${mission.completed ? 'checked' : ''}>
+            <label for="mission-${index}" class="${mission.completed ? 'line-through' : ''}">${mission.text}</label>
+        `;
+        missionListEl.appendChild(missionEl);
+    });
+}
+
+function renderTransactions() {
+    transactionListEl.innerHTML = '';
+    if (state.transactions.length === 0) {
+        transactionListEl.innerHTML = '<p class="text-center opacity-50">Sin transacciones.</p>';
+        return;
+    }
+    [...state.transactions].reverse().forEach(tx => {
+        const isIncome = tx.type === 'income';
+        const txEl = document.createElement('div');
+        txEl.className = 'p-2 border-b-2 border-dashed border-gray-700';
+        txEl.innerHTML = `
+            <div class="flex justify-between items-center">
+                <span>${tx.description}</span>
+                <span class="font-bold ${isIncome ? 'text-green-400' : 'text-red-400'}">${isIncome ? '+' : '-'}$${tx.amount.toFixed(2)}</span>
+            </div>
+            <div class="text-xs opacity-60 text-right">${tx.date}</div>
+        `;
+        transactionListEl.appendChild(txEl);
+    });
+}
+
+function renderStore() {
+    storeListEl.innerHTML = '';
+    if (state.storeItems.length === 0) {
+        storeListEl.innerHTML = '<p class="text-center opacity-50 col-span-full">La tienda está vacía.</p>';
+        return;
+    }
+    state.storeItems.forEach((item, index) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = `pixel-box !p-4 flex flex-col justify-between ${item.purchased ? 'opacity-50' : ''}`;
+        itemEl.innerHTML = `
+            <div>
+                <h4 class="text-lg text-text-accent-color">${item.name}</h4>
+                <p class="text-green-400 mb-4">$${item.price.toFixed(2)}</p>
+            </div>
+            ${!item.purchased ? 
+            `<button class="pixel-button yellow w-full" onclick="buyStoreItem(${index})">Comprar</button>` :
+            `<p class="text-center text-green-400">¡ADQUIRIDO!</p>`}
+        `;
+        storeListEl.appendChild(itemEl);
+    });
+}
+
+function renderWardrobe() {
+    wardrobeInventoryEl.innerHTML = state.wardrobe.clothes.length === 0 ? '<p class="text-center opacity-50 col-span-full">Armario vacío.</p>' : state.wardrobe.clothes.map(item => `
+        <div class="relative group">
+            <img src="${item.imageUrl}" alt="${item.name}" class="w-full h-24 object-cover border-2 border-gray-400" onerror="this.src='https://placehold.co/100x100/161b22/c9d1d9?text=Error'">
+            <div class="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onclick="removeWardrobeItem('${item.id}')" class="text-red-500"><i data-lucide="trash-2"></i></button>
+            </div>
+        </div>
+    `).join('');
+
+    weeklyPlannerEl.innerHTML = Object.keys(state.wardrobe.outfits).map(day => {
+        const outfitHtml = state.wardrobe.outfits[day].map(itemId => {
+            const item = state.wardrobe.clothes.find(c => c.id === itemId);
+            return item ? `<img src="${item.imageUrl}" class="w-8 h-8 inline-block border-2 border-gray-400" title="${item.name}">` : '';
+        }).join('');
+        return `
+            <div class="border-2 border-gray-600 border-dashed p-2">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-md">${day}</h4>
+                    <button class="pixel-button !p-1 text-xs" onclick="openOutfitPlanner('${day}')">Plan</button>
+                </div>
+                <div class="flex flex-wrap gap-1 min-h-[40px]">${outfitHtml || '<p class="text-xs opacity-50">Sin planificar</p>'}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+
+// --- ACTION FUNCTIONS ---
+function addMission() {
+    const input = document.getElementById('new-mission-input');
+    const text = input.value.trim();
+    if (!text) return;
+    state.missions.push({ text, completed: false });
+    input.value = '';
+    saveState();
+    render();
+}
+
+function toggleMission(index) {
+    state.missions[index].completed = !state.missions[index].completed;
+    saveState();
+    render();
+}
+
+function addTransaction(type) {
+    const amountEl = document.getElementById(`${type}-amount`);
+    const descriptionEl = type === 'income' ? document.getElementById('income-source') : document.getElementById('expense-description');
+    const amount = parseFloat(amountEl.value);
+    const description = descriptionEl.value.trim();
+
+    if (!amount || amount <= 0 || !description) {
+        console.error('Por favor, completa todos los campos.'); return;
+    }
+    if (type === 'expense' && amount > state.balance) {
+        console.error('No tienes suficiente saldo.'); return;
+    }
+
+    state.balance += (type === 'income' ? amount : -amount);
+    state.transactions.push({ 
+        type, 
+        amount, 
+        description, 
+        date: new Date().toLocaleDateString('es-MX', { year: 'numeric', month: 'short', day: 'numeric' }) 
+    });
+    
+    amountEl.value = '';
+    descriptionEl.value = '';
+    closeModal(`${type}-modal`);
+    saveState();
+    render();
+}
+
+function addStoreItem() {
+    const nameEl = document.getElementById('item-name');
+    const priceEl = document.getElementById('item-price');
+    const name = nameEl.value.trim();
+    const price = parseFloat(priceEl.value);
+
+    if (!name || !price || price <= 0) {
+        console.error('Completa los campos del objeto.'); return;
+    }
+    state.storeItems.push({ name, price, purchased: false });
+    nameEl.value = '';
+    priceEl.value = '';
+    closeModal('new-item-modal');
+    saveState();
+    render();
+}
+
+function buyStoreItem(index) {
+    const item = state.storeItems[index];
+    if (item.purchased || state.balance < item.price) {
+        console.error(item.purchased ? 'Ya tienes este objeto.' : '¡No tienes suficiente saldo!');
+        return;
+    }
+    // Se elimina la confirmación para evitar bloqueos
+    state.balance -= item.price;
+    item.purchased = true;
+    saveState();
+    render();
+}
+
+function addWardrobeItem() {
+    const nameEl = document.getElementById('clothing-name');
+    const urlEl = document.getElementById('clothing-url');
+    const name = nameEl.value.trim();
+    const imageUrl = urlEl.value.trim();
+    
+    if (!name || !imageUrl) {
+        console.error('Completa los campos de la prenda.'); return;
+    }
+    
+    state.wardrobe.clothes.push({ id: `cloth_${Date.now()}`, name, imageUrl });
+    nameEl.value = '';
+    urlEl.value = '';
+    closeModal('add-clothing-modal');
+    saveState();
+    render();
+}
+
+function removeWardrobeItem(itemId) {
+    // Se elimina la confirmación para evitar bloqueos
+    state.wardrobe.clothes = state.wardrobe.clothes.filter(item => item.id !== itemId);
+    Object.keys(state.wardrobe.outfits).forEach(day => {
+        state.wardrobe.outfits[day] = state.wardrobe.outfits[day].filter(id => id !== itemId);
+    });
+    saveState();
+    render();
+}
+
+function openOutfitPlanner(day) {
+    window.planningDay = day;
+    document.getElementById('plan-outfit-title').textContent = `Planificar Outfit para ${day}`;
+    const inventoryContainer = document.getElementById('plan-outfit-inventory');
+    
+    const clearButton = `<button class="pixel-button gray !p-2 col-span-full" onclick="clearOutfit('${day}')">Limpiar selección</button>`;
+    const itemsHtml = state.wardrobe.clothes.map(item => {
+        const isSelected = state.wardrobe.outfits[day].includes(item.id);
+        return `
+            <div class="cursor-pointer" onclick="toggleOutfitItem('${day}', '${item.id}')">
+                <img src="${item.imageUrl}" class="w-full h-24 object-cover border-4 ${isSelected ? 'border-accent-color' : 'border-gray-400'}" style="${isSelected ? '--tw-border-opacity: 1; border-color: rgb(56 139 253 / var(--tw-border-opacity));' : ''}">
+            </div>
+        `;
+    }).join('');
+
+    inventoryContainer.innerHTML = clearButton + itemsHtml;
+    openModal('plan-outfit-modal');
+}
+
+function toggleOutfitItem(day, itemId) {
+    const outfit = state.wardrobe.outfits[day];
+    const itemIndex = outfit.indexOf(itemId);
+    if (itemIndex > -1) outfit.splice(itemIndex, 1);
+    else outfit.push(itemId);
+    saveState();
+    openOutfitPlanner(day);
+}
+
+function clearOutfit(day) {
+    state.wardrobe.outfits[day] = [];
+    saveState();
+    render();
+    closeModal('plan-outfit-modal');
+}
+
+
+// --- UTILITIES (TABS, MODALS) ---
+function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`${tabId}-tab`).classList.add('active');
+    document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active');
+}
+
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+// --- INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    loadState();
+    render();
+    showTab('misiones');
+});
+</script>
+</body>
+</html>
+
+
