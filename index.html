@@ -85,7 +85,7 @@
             <div id="finanzas-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center text-text-accent-color">LIBRO DE CUENTAS</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><button class="pixel-button green sfx-click" onclick="openModal('income-modal')">+ Ingreso</button><button class="pixel-button red sfx-click" onclick="openModal('expense-modal')">- Egreso</button></div><h3 class="text-lg mb-2">Historial:</h3><div id="transaction-list" class="space-y-3 text-sm max-h-80 overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div></div></div>
             <div id="tienda-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center text-text-accent-color">TIENDA DE DESEOS</h2><div class="carousel-wrapper"><div id="store-carousel" class="carousel-container"></div><div class="carousel-nav"><button class="nav-arrow" onclick="slideStore(-1)"><i data-lucide="arrow-left"></i></button><button class="nav-arrow" onclick="slideStore(1)"><i data-lucide="arrow-right"></i></button></div></div><button class="pixel-button w-full mt-6 sfx-click" onclick="openModal('new-item-modal')">Añadir Objeto</button></div></div>
             <div id="inventario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center text-text-accent-color">INVENTARIO</h2><div id="inventory-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto p-2"></div></div></div>
-            <div id="armario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-6 text-center text-text-accent-color">GUARDARROPA</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg-col-span-1"><h3 class="text-lg mb-4">Planificador</h3><div id="weekly-planner" class="space-y-3"></div></div><div class="lg:col-span-2"><h3 class="text-lg mb-4">Mi Inventario</h3><div id="wardrobe-inventory" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div><button class="pixel-button w-full mt-4 sfx-click" onclick="openModal('add-clothing-modal')">Añadir Prenda</button></div></div></div></div>
+            <div id="armario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-6 text-center text-text-accent-color">GUARDARROPA</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-1"><h3 class="text-lg mb-4">Planificador</h3><div id="weekly-planner" class="space-y-3"></div></div><div class="lg:col-span-2"><h3 class="text-lg mb-4">Mi Inventario</h3><div id="wardrobe-inventory" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div><button class="pixel-button w-full mt-4 sfx-click" onclick="openModal('add-clothing-modal')">Añadir Prenda</button></div></div></div></div>
             <div id="ajustes-tab" class="tab-content">
                 <div class="pixel-box">
                     <h2 class="text-xl mb-6 text-center text-text-accent-color">AJUSTES DE SONIDO</h2>
@@ -102,6 +102,7 @@
         </main>
     </div>
     
+    <!-- MODALES -->
     <div id="income-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Registrar Ingreso</h3><input type="number" id="income-amount" placeholder="Monto ($)" class="mb-3"><input type="text" id="income-source" placeholder="Origen (ej. Salario)" class="mb-4"><div class="flex justify-end gap-3"><button class="pixel-button gray sfx-click" onclick="closeModal('income-modal')">Cerrar</button><button class="pixel-button green sfx-click" onclick="addTransaction('income')">Registrar</button></div></div></div>
     <div id="expense-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Registrar Egreso</h3><input type="number" id="expense-amount" placeholder="Monto ($)" class="mb-3"><input type="text" id="expense-description" placeholder="Descripción (ej. Comida)" class="mb-4"><div class="flex justify-end gap-3"><button class="pixel-button gray sfx-click" onclick="closeModal('expense-modal')">Cerrar</button><button class="pixel-button red sfx-click" onclick="addTransaction('expense')">Registrar</button></div></div></div>
     <div id="new-item-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Nuevo Objeto</h3><input type="text" id="item-name" placeholder="Nombre" class="mb-3"><input type="number" id="item-price" placeholder="Precio ($)" class="mb-3"><label class="text-sm mb-2 block">Imagen (PNG, JPG):</label><input type="file" id="item-image-upload" accept="image/png, image/jpeg" class="mb-4"><div class="flex justify-end gap-3"><button class="pixel-button gray sfx-click" onclick="closeModal('new-item-modal')">Cerrar</button><button class="pixel-button sfx-click" onclick="addStoreItem()">Añadir</button></div></div></div>
@@ -131,13 +132,13 @@ const UMBRAL_COMPRA_GRANDE = 0.30;
 
 function saveState() { 
     try {
-        localStorage.setItem('miVidaRpgState_v11', JSON.stringify(state)); 
+        localStorage.setItem('miVidaRpgState_v12', JSON.stringify(state)); 
     } catch (e) {
-        console.error("Error al guardar el estado. ¿Navegador en modo privado o almacenamiento lleno?", e);
+        console.error("Error al guardar el estado:", e);
     }
 }
 function loadState() { 
-    const s = localStorage.getItem('miVidaRpgState_v11'); 
+    const s = localStorage.getItem('miVidaRpgState_v12'); 
     if(s) { 
         state = JSON.parse(s); 
         if (!state.audio) { state.audio = { music: null, musicFileName: null }; }
@@ -147,6 +148,13 @@ function loadState() {
 function render() { renderStats(); renderMissions(); renderTransactions(); renderStore(); renderInventory(); renderWardrobe(); renderAjustes(); lucide.createIcons(); }
 function renderStats() { DOM.playerBalance.textContent = `$${state.balance.toFixed(2)}`; updateXpBar(); }
 function updateXpBar() { const total = state.missions.length; const completed = state.missions.filter(m => m.completed).length; const perc = total === 0 ? 0 : Math.round((completed / total) * 100); DOM.xpBar.style.width = `${perc}%`; DOM.xpText.textContent = `${perc}%`; }
+
+function renderMissions() {
+    DOM.missionList.innerHTML = state.missions.length === 0 ? '<p class="text-center opacity-50">No hay misiones.</p>' : state.missions.map((m, i) => `<div class="p-3 border-2 ${m.completed ? 'border-gray-600 opacity-50' : 'border-gray-400'} flex items-center"><input type="checkbox" id="mission-${i}" class="pixel-checkbox" onchange="toggleMission(${i})" ${m.completed ? 'checked' : ''}><label for="mission-${i}" class="${m.completed ? 'line-through' : ''}">${m.text}</label></div>`).join('');
+}
+function renderTransactions() {
+    DOM.transactionList.innerHTML = state.transactions.length === 0 ? '<p class="text-center opacity-50">Sin transacciones.</p>' : [...state.transactions].reverse().map(tx => `<div class="p-2 border-b-2 border-dashed border-gray-700"><div class="flex justify-between items-center"><span>${tx.description}</span><span class="font-bold ${tx.type === 'income' ? 'text-green-400' : 'text-red-400'}">${tx.type === 'income' ? '+' : '-'}$${tx.amount.toFixed(2)}</span></div><div class="text-xs opacity-60 text-right">${tx.date}</div></div>`).join('');
+}
 
 function renderStore() {
     const unpurchasedItems = state.storeItems.filter(item => !item.purchased);
@@ -174,17 +182,14 @@ function renderAjustes() {
 }
 
 function playSound(soundUrl) { try { DOM.sfxPlayer.src = soundUrl; DOM.sfxPlayer.play(); } catch(e) {} }
-function updateMusicSource() { 
-    DOM.bgMusic.src = state.audio.music || DEFAULT_MUSIC_URL; 
-    DOM.bgMusic.loop = true; // **AQUÍ ESTÁ LA CORRECCIÓN PARA EL BUCLE**
-}
+function updateMusicSource() { DOM.bgMusic.src = state.audio.music || DEFAULT_MUSIC_URL; }
 function toggleMusic() {
     const icon = DOM.musicToggleBtn.querySelector('i');
     if (DOM.bgMusic.paused) {
         DOM.bgMusic.play().then(() => {
             icon.setAttribute('data-lucide', 'volume-2');
             lucide.createIcons();
-        }).catch(e => console.log("El usuario debe interactuar para iniciar la música."));
+        }).catch(e => {});
     } else {
         DOM.bgMusic.pause();
         icon.setAttribute('data-lucide', 'volume-x');
@@ -193,7 +198,7 @@ function toggleMusic() {
 }
 function handleFileUpload(file, callback) {
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { // 10MB Limit
+    if (file.size > 10 * 1024 * 1024) { 
         DOM.musicFileName.textContent = "Error: Archivo muy grande (máx 10MB)";
         DOM.musicFileName.style.color = 'var(--danger-color)';
         return;
@@ -202,6 +207,48 @@ function handleFileUpload(file, callback) {
     const reader = new FileReader();
     reader.onload = (e) => { callback(e.target.result); };
     reader.readAsDataURL(file);
+}
+
+function addMission() {
+    const input = document.getElementById('new-mission-input');
+    const text = input.value.trim();
+    if (text) {
+        state.missions.push({ text, completed: false });
+        input.value = '';
+        saveState();
+        render();
+    }
+}
+function toggleMission(index) {
+    state.missions[index].completed = !state.missions[index].completed;
+    saveState();
+    render();
+}
+function addTransaction(type) {
+    const amountEl = document.getElementById(`${type}-amount`);
+    const descriptionEl = type === 'income' ? document.getElementById('income-source') : document.getElementById('expense-description');
+    const amount = parseFloat(amountEl.value);
+    const description = descriptionEl.value.trim();
+    if (!amount || amount <= 0 || !description) return;
+    if (type === 'expense' && amount > state.balance) return;
+    state.balance += (type === 'income' ? amount : -amount);
+    state.transactions.push({ type, amount, description, date: new Date().toLocaleDateString('es-MX') });
+    amountEl.value = '';
+    descriptionEl.value = '';
+    closeModal(`${type}-modal`);
+    saveState();
+    render();
+}
+function addStoreItem() {
+    const nameEl = document.getElementById('item-name'), priceEl = document.getElementById('item-price'), imageEl = document.getElementById('item-image-upload');
+    const name = nameEl.value.trim(), price = parseFloat(priceEl.value), file = imageEl.files[0];
+    if (!name || !price || price <= 0) return;
+    const processItem = (imageData) => {
+        state.storeItems.push({id:`item_${Date.now()}`,name,price,imageData,purchased:false});
+        nameEl.value=''; priceEl.value=''; imageEl.value='';
+        closeModal('new-item-modal'); saveState(); render();
+    };
+    if(file){ const reader=new FileReader(); reader.onload=(e)=>processItem(e.target.result); reader.readAsDataURL(file); } else { processItem(null); }
 }
 
 function confirmPurchase(index) {
@@ -216,7 +263,7 @@ function buyStoreItem(index) { const item=state.storeItems[index]; state.balance
 function showConfirmation(title, message, btnClass, callback) {
     DOM.confirmModal.title.textContent = title; DOM.confirmModal.message.textContent = message;
     DOM.confirmModal.okBtn.className = `pixel-button ${btnClass} sfx-click`;
-    const newOkBtn = DOM.confirmModal.okBtn.cloneNode(true);
+    const newOkBtn = DOM.confirmál.okBtn.cloneNode(true);
     DOM.confirmModal.okBtn.parentNode.replaceChild(newOkBtn, DOM.confirmModal.okBtn);
     DOM.confirmModal.okBtn = newOkBtn;
     DOM.confirmModal.okBtn.addEventListener('click', () => { callback(); closeModal('confirm-modal'); });
@@ -240,8 +287,12 @@ document.addEventListener('DOMContentLoaded', () => {
         handleFileUpload(file, (data) => {
             state.audio.music = data;
             state.audio.musicFileName = file.name;
+            saveState();
             updateMusicSource();
-            toggleMusic(); // Intenta reproducir la nueva canción inmediatamente
+            DOM.bgMusic.play(); // Play the new song immediately
+            const icon = DOM.musicToggleBtn.querySelector('i');
+            icon.setAttribute('data-lucide', 'volume-2');
+            lucide.createIcons();
             renderAjustes();
         });
     });
@@ -250,8 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Código restante (simplificado para brevedad, sin cambios)
-function addMission(){} function toggleMission(i){} function addTransaction(type){} function addStoreItem(){} function renderMissions(){} function renderTransactions(){} function renderWardrobe(){} function addWardrobeItem(){} function removeWardrobeItem(id){} function openOutfitPlanner(day){} function toggleOutfitItem(day,id){} function clearOutfit(day){}
+// Código restante (simplificado)
+function renderWardrobe(){} function addWardrobeItem(){} function removeWardrobeItem(id){} function openOutfitPlanner(day){} function toggleOutfitItem(day,id){} function clearOutfit(day){}
 </script>
 </body>
 </html>
+
