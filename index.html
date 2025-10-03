@@ -11,9 +11,15 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --bg-color: #0d1117; --main-color: #161b22; --border-color: #30363d;
-            --text-color: #c9d1d9; --text-accent-color: #f0f6fc; --accent-color: #388bfd;
-            --xp-color: #388bfd; --success-color: #238636; --danger-color: #da3633;
+            --bg-color: #0d1117; /* Negro azulado oscuro */
+            --main-color: #161b22; /* Un poco más claro para los contenedores */
+            --border-color: #30363d; /* Bordes sutiles */
+            --text-color: #c9d1d9; /* Blanco suave */
+            --text-accent-color: #f0f6fc; /* Blanco más brillante para títulos */
+            --accent-color: #388bfd; /* Azul neón brillante */
+            --xp-color: #388bfd;
+            --success-color: #238636;
+            --danger-color: #da3633;
         }
         body { font-family: 'Press Start 2P', cursive; background-color: var(--bg-color); color: var(--text-color); text-shadow: 2px 2px #00000060; image-rendering: pixelated; }
         .pixel-box { background-color: var(--main-color); border: 4px solid var(--border-color); box-shadow: 6px 6px 0px #000000; padding: 1.5rem; }
@@ -35,23 +41,47 @@
         .pixel-checkbox:checked { background-color: var(--accent-color); border-color: var(--text-accent-color); }
         .pixel-checkbox:checked::after { content: 'X'; color: var(--text-accent-color); position: absolute; font-size: 14px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
         
-        /* --- NUEVOS ESTILOS PARA TIENDA Y CARRUSEL --- */
+        /* --- ESTILOS DE CARRUSEL --- */
         .carousel-wrapper { position: relative; }
-        .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; /* Firefox */ }
+        .carousel-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; /* Firefox */ -webkit-overflow-scrolling: touch; /* iOS */ }
         .carousel-container::-webkit-scrollbar { display: none; /* Safari & Chrome */ }
-        .carousel-slide { flex: 0 0 80%; scroll-snap-align: center; margin: 0 10px; }
+        .carousel-slide { flex: 0 0 80%; scroll-snap-align: center; margin: 0 10px; padding-bottom: 2rem; } /* Más padding para el nombre y el precio */
         @media (min-width: 768px) { .carousel-slide { flex-basis: 40%; } }
         @media (min-width: 1024px) { .carousel-slide { flex-basis: 30%; } }
         .carousel-nav { display: none; position: absolute; top: 50%; transform: translateY(-50%); width: 100%; justify-content: space-between; pointer-events: none; }
         @media (min-width: 768px) { .carousel-nav { display: flex; } }
         .nav-arrow { pointer-events: all; background-color: rgba(22, 27, 34, 0.7); border: 2px solid var(--border-color); border-radius: 50%; padding: 0.5rem; }
         
-        .item-image { width: 100%; height: 180px; object-fit: contain; background-color: var(--bg-color); border: 3px solid var(--border-color); transition: filter 0.3s ease-in-out; }
+        /* --- IMÁGENES DE ITEMS (TIENDA E INVENTARIO) SIN RECUADRO --- */
+        .item-image {
+            width: 100%;
+            height: 180px; /* Altura generosa para el objeto */
+            object-fit: contain; /* Ajusta la imagen dentro del espacio sin recortar */
+            background-color: transparent; /* Fondo transparente */
+            border: none; /* Sin borde */
+            transition: filter 0.3s ease-in-out;
+        }
         .item-image.locked { filter: grayscale(1) opacity(0.5); }
         .lock-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; color: var(--text-accent-color); text-shadow: 3px 3px 0px #000; pointer-events: none; }
         
         input[type="file"] { border: none; padding: 0; }
         input[type="file"]::file-selector-button { font-family: 'Press Start 2P'; background-color: var(--accent-color); border: 2px solid var(--border-color); padding: 0.5rem; color: var(--text-accent-color); cursor: pointer; }
+
+        /* Contenedores de items más limpios */
+        .item-card-minimal {
+            background-color: transparent; /* El fondo lo da el carrusel o el inventario */
+            border: none; /* Sin borde exterior */
+            box-shadow: none; /* Sin sombra exterior */
+            padding: 0.5rem; /* Pequeño padding interno si es necesario */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative; /* Para el overlay del candado */
+        }
+        .item-card-minimal .item-name { margin-top: 0.5rem; font-size: 0.9rem; }
+        .item-card-minimal .item-price { font-size: 0.8rem; }
+
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -105,7 +135,6 @@
         </main>
     </div>
 
-    <!-- MODALES -->
     <div id="income-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Registrar Ingreso</h3><input type="number" id="income-amount" placeholder="Monto ($)" class="mb-3"><input type="text" id="income-source" placeholder="Origen (ej. Salario)" class="mb-4"><div class="flex justify-end gap-3"><button onclick="closeModal('income-modal')" class="pixel-button gray">Cerrar</button><button onclick="addTransaction('income')" class="pixel-button green">Registrar</button></div></div></div>
     <div id="expense-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Registrar Egreso</h3><input type="number" id="expense-amount" placeholder="Monto ($)" class="mb-3"><input type="text" id="expense-description" placeholder="Descripción (ej. Comida)" class="mb-4"><div class="flex justify-end gap-3"><button onclick="closeModal('expense-modal')" class="pixel-button gray">Cerrar</button><button onclick="addTransaction('expense')" class="pixel-button red">Registrar</button></div></div></div>
     <div id="new-item-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Nuevo Objeto para la Tienda</h3><input type="text" id="item-name" placeholder="Nombre del objeto" class="mb-3"><input type="number" id="item-price" placeholder="Precio ($)" class="mb-3"><label class="text-sm mb-2 block">Imagen (PNG, JPG):</label><input type="file" id="item-image-upload" accept="image/png, image/jpeg" class="mb-4"><div class="flex justify-end gap-3"><button onclick="closeModal('new-item-modal')" class="pixel-button gray">Cerrar</button><button onclick="addStoreItem()" class="pixel-button">Añadir</button></div></div></div>
@@ -116,8 +145,8 @@
 let state = { balance: 0, missions: [], transactions: [], storeItems: [], wardrobe: { clothes: [], outfits: { Lunes: [], Martes: [], Miércoles: [], Jueves: [], Viernes: [], Sábado: [], Domingo: [] } } };
 const DOM = { xpBar: document.getElementById('xp-bar'), xpText: document.getElementById('xp-text'), playerBalance: document.getElementById('player-balance'), missionList: document.getElementById('mission-list'), transactionList: document.getElementById('transaction-list'), storeCarousel: document.getElementById('store-carousel'), inventoryList: document.getElementById('inventory-list'), wardrobeInventory: document.getElementById('wardrobe-inventory'), weeklyPlanner: document.getElementById('weekly-planner') };
 
-function saveState() { localStorage.setItem('miVidaRpgState_v4', JSON.stringify(state)); }
-function loadState() { const s = localStorage.getItem('miVidaRpgState_v4'); if(s) state = JSON.parse(s); }
+function saveState() { localStorage.setItem('miVidaRpgState_v5', JSON.stringify(state)); } // Actualizado a v5 para evitar conflictos con versiones anteriores
+function loadState() { const s = localStorage.getItem('miVidaRpgState_v5'); if(s) state = JSON.parse(s); }
 
 function render() {
     renderStats(); renderMissions(); renderTransactions(); renderStore(); renderInventory(); renderWardrobe(); lucide.createIcons();
@@ -130,25 +159,28 @@ function renderTransactions() { DOM.transactionList.innerHTML = state.transactio
 
 function renderStore() {
     const unpurchasedItems = state.storeItems.filter(item => !item.purchased);
-    DOM.storeCarousel.innerHTML = unpurchasedItems.length === 0 ? '<p class="text-center opacity-50 w-full">¡Has comprado todo!</p>' : unpurchasedItems.map((item, index) => {
+    DOM.storeCarousel.innerHTML = unpurchasedItems.length === 0 ? '<p class="text-center opacity-50 w-full">¡Has comprado todo lo disponible!</p>' : unpurchasedItems.map((item, index) => {
         const originalIndex = state.storeItems.findIndex(i => i.id === item.id);
         const imageUrl = item.imageData || `https://placehold.co/300x200/161b22/c9d1d9?text=${item.name.replace(/\s/g,'+')}`;
-        return `<div class="carousel-slide pixel-box !p-2 flex flex-col justify-between"><div class="relative mb-2"><img src="${imageUrl}" alt="${item.name}" class="item-image locked"><div class="lock-overlay"><i data-lucide="lock" class="w-16 h-16"></i></div></div><h4 class="text-lg text-text-accent-color text-center truncate">${item.name}</h4><p class="text-green-400 text-center mb-2">$${item.price.toFixed(2)}</p><button class="pixel-button yellow w-full" onclick="buyStoreItem(${originalIndex})">Comprar</button></div>`;
+        return `<div class="carousel-slide item-card-minimal"><div class="relative w-full mb-2"><img src="${imageUrl}" alt="${item.name}" class="item-image locked"><div class="lock-overlay"><i data-lucide="lock" class="w-16 h-16"></i></div></div><h4 class="item-name text-text-accent-color text-center truncate">${item.name}</h4><p class="item-price text-green-400 text-center mb-2">$${item.price.toFixed(2)}</p><button class="pixel-button yellow w-full" onclick="buyStoreItem(${originalIndex})">Comprar</button></div>`;
     }).join('');
+    // Resetea el scroll del carrusel cada vez que se renderiza para mostrar el primer elemento
+    DOM.storeCarousel.scrollLeft = 0;
+    lucide.createIcons(); 
 }
 
 function renderInventory() {
     const purchasedItems = state.storeItems.filter(item => item.purchased);
     DOM.inventoryList.innerHTML = purchasedItems.length === 0 ? '<p class="text-center opacity-50 col-span-full">Aún no tienes objetos.</p>' : purchasedItems.map(item => {
         const imageUrl = item.imageData || `https://placehold.co/300x200/161b22/c9d1d9?text=${item.name.replace(/\s/g,'+')}`;
-        return `<div class="pixel-box !p-2 flex flex-col"><img src="${imageUrl}" alt="${item.name}" class="item-image mb-2"><h4 class="text-md text-text-accent-color text-center truncate">${item.name}</h4></div>`;
+        return `<div class="item-card-minimal"><img src="${imageUrl}" alt="${item.name}" class="item-image mb-2"><h4 class="item-name text-text-accent-color text-center truncate">${item.name}</h4></div>`;
     }).join('');
 }
 
 function renderWardrobe() {
-    DOM.wardrobeInventory.innerHTML = state.wardrobe.clothes.length === 0 ? '<p class="text-center opacity-50 col-span-full">Armario vacío.</p>' : state.wardrobe.clothes.map(item => `<div class="relative group"><img src="${item.imageUrl}" alt="${item.name}" class="w-full h-24 object-cover border-2 border-gray-400" onerror="this.src='https://placehold.co/100x100/161b22/c9d1d9?text=Error'"><div class="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><button onclick="removeWardrobeItem('${item.id}')" class="text-red-500"><i data-lucide="trash-2"></i></button></div></div>`).join('');
+    DOM.wardrobeInventory.innerHTML = state.wardrobe.clothes.length === 0 ? '<p class="text-center opacity-50 col-span-full">Armario vacío.</p>' : state.wardrobe.clothes.map(item => `<div class="relative group"><img src="${item.imageUrl}" alt="${item.name}" class="w-full h-24 object-contain border-2 border-gray-400 bg-transparent" onerror="this.src='https://placehold.co/100x100/161b22/c9d1d9?text=Error'"><div class="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><button onclick="removeWardrobeItem('${item.id}')" class="text-red-500"><i data-lucide="trash-2"></i></button></div></div>`).join('');
     DOM.weeklyPlanner.innerHTML = Object.keys(state.wardrobe.outfits).map(day => {
-        const outfitHtml = state.wardrobe.outfits[day].map(id => { const item = state.wardrobe.clothes.find(c => c.id === id); return item ? `<img src="${item.imageUrl}" class="w-8 h-8 inline-block border-2 border-gray-400" title="${item.name}">` : '' }).join('');
+        const outfitHtml = state.wardrobe.outfits[day].map(id => { const item = state.wardrobe.clothes.find(c => c.id === id); return item ? `<img src="${item.imageUrl}" class="w-8 h-8 inline-block object-contain border-2 border-gray-400 bg-transparent" title="${item.name}">` : '' }).join('');
         return `<div class="border-2 border-dashed border-gray-600 p-2"><div class="flex justify-between items-center mb-2"><h4 class="text-md">${day}</h4><button class="pixel-button !p-1 text-xs" onclick="openOutfitPlanner('${day}')">Plan</button></div><div class="flex flex-wrap gap-1 min-h-[40px]">${outfitHtml || '<p class="text-xs opacity-50">Sin planificar</p>'}</div></div>`;
     }).join('');
 }
@@ -170,7 +202,8 @@ function addStoreItem() {
         }
         reader.readAsDataURL(file);
     } else {
-        state.storeItems.push({ id: `item_${Date.now()}`, name, price, imageData: null, purchased: false });
+        // En caso de no subir imagen, usa un placeholder con fondo transparente
+        state.storeItems.push({ id: `item_${Date.now()}`, name, price, imageData: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect width='300' height='200' fill='transparent'/%3E%3Ctext x='50%25' y='50%25' font-family='Press Start 2P, cursive' font-size='20' fill='%23c9d1d9' text-anchor='middle' alignment-baseline='middle'%3E${encodeURIComponent(name.replace(/\s/g,'+'))}%3C/text%3E%3C/svg%3E`, purchased: false });
         resetModalAndRender();
     }
     function resetModalAndRender() {
@@ -183,10 +216,13 @@ function buyStoreItem(index) { const item = state.storeItems[index]; if(item.pur
 function addWardrobeItem() { const nEl=document.getElementById('clothing-name'), uEl=document.getElementById('clothing-url'), n=nEl.value.trim(), u=uEl.value.trim(); if(!n||!u) return; state.wardrobe.clothes.push({id:`cloth_${Date.now()}`,name:n,imageUrl:u}); nEl.value='';uEl.value=''; closeModal('add-clothing-modal'); saveState(); render(); }
 function removeWardrobeItem(id) { state.wardrobe.clothes=state.wardrobe.clothes.filter(i=>i.id!==id); Object.keys(state.wardrobe.outfits).forEach(d=>{ state.wardrobe.outfits[d]=state.wardrobe.outfits[d].filter(i=>i!==id) }); saveState(); render(); }
 
-function openOutfitPlanner(day) { window.planningDay=day; document.getElementById('plan-outfit-title').textContent=`Planificar Outfit para ${day}`; const inv=document.getElementById('plan-outfit-inventory'); const cBtn=`<button class="pixel-button gray !p-2 col-span-full" onclick="clearOutfit('${day}')">Limpiar</button>`; const iHtml=state.wardrobe.clothes.map(i=>{const s=state.wardrobe.outfits[day].includes(i.id);return`<div class="cursor-pointer" onclick="toggleOutfitItem('${day}','${i.id}')"><img src="${i.imageUrl}" class="w-full h-24 object-cover border-4 ${s?'border-accent-color':'border-gray-400'}" style="${s?'--tw-border-opacity:1;border-color:rgb(56 139 253/var(--tw-border-opacity));':''}"></div>`}).join(''); inv.innerHTML=cBtn+iHtml; openModal('plan-outfit-modal');}
+function openOutfitPlanner(day) { window.planningDay=day; document.getElementById('plan-outfit-title').textContent=`Planificar Outfit para ${day}`; const inv=document.getElementById('plan-outfit-inventory'); const cBtn=`<button class="pixel-button gray !p-2 col-span-full" onclick="clearOutfit('${day}')">Limpiar</button>`; const iHtml=state.wardrobe.clothes.map(i=>{const s=state.wardrobe.outfits[day].includes(i.id);return`<div class="cursor-pointer" onclick="toggleOutfitItem('${day}','${i.id}')"><img src="${i.imageUrl}" class="w-full h-24 object-contain border-4 ${s?'border-accent-color':'border-gray-400'}" style="${s?'--tw-border-opacity:1;border-color:rgb(56 139 253/var(--tw-border-opacity));':''}"></div>`}).join(''); inv.innerHTML=cBtn+iHtml; openModal('plan-outfit-modal');}
 function toggleOutfitItem(day, id) { const o=state.wardrobe.outfits[day], i=o.indexOf(id); if(i>-1)o.splice(i,1); else o.push(id); saveState(); openOutfitPlanner(day); }
 function clearOutfit(day) { state.wardrobe.outfits[day]=[]; saveState(); render(); closeModal('plan-outfit-modal'); }
-function slideStore(dir) { const c=DOM.storeCarousel; const scrollAmount = c.clientWidth * 0.85; c.scrollBy({ left: scrollAmount * dir, behavior: 'smooth' }); }
+function slideStore(dir) { const c=DOM.storeCarousel; const slideWidth = c.querySelector('.carousel-slide') ? c.querySelector('.carousel-slide').offsetWidth + 20 : c.clientWidth; // Ancho del slide + margen
+    c.scrollBy({ left: slideWidth * dir, behavior: 'smooth' });
+}
+
 
 function showTab(tabId) { document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active')); document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active')); document.getElementById(`${tabId}-tab`).classList.add('active'); document.querySelector(`.tab-button[onclick="showTab('${tabId}')"]`).classList.add('active'); }
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -196,4 +232,3 @@ document.addEventListener('DOMContentLoaded', () => { loadState(); render(); sho
 </script>
 </body>
 </html>
-
