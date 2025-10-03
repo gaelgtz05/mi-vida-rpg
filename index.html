@@ -52,6 +52,21 @@
         .item-card-minimal .item-name { margin-top: 0.5rem; font-size: 0.9rem; }
         .item-card-minimal .item-price { font-size: 0.8rem; }
         .financial-tag { font-size: 0.6rem; padding: 2px 6px; border: 2px solid; margin-bottom: 0.5rem; }
+        
+        /* --- NUEVOS ESTILOS PARA EL PERSONAJE --- */
+        #character-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid var(--border-color);
+            object-fit: cover;
+            background-color: var(--bg-color);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #character-avatar:hover {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -61,9 +76,19 @@
 
     <div class="container mx-auto max-w-5xl">
         <header class="pixel-box mb-8">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <div class="text-center md:text-left"><h1 class="text-2xl md:text-3xl text-text-accent-color">MI VIDA RPG</h1></div>
-                <div class="w-full md:w-2/3 space-y-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-4">
+                    <label for="avatar-upload" class="cursor-pointer">
+                        <img id="character-avatar" src="https://placehold.co/80x80/161b22/c9d1d9?text=?" alt="Avatar">
+                    </label>
+                    <input type="file" id="avatar-upload" class="hidden" accept="image/png, image/jpeg">
+                    <div>
+                        <h1 id="character-username" class="text-xl md:text-2xl text-text-accent-color">elgatin</h1>
+                        <p class="text-xs text-gray-500">Organizador Personal</p>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2 space-y-3">
                     <div class="flex items-center gap-2 text-sm"><span class="text-blue-400">PROGRESO:</span><div class="progress-bar-container w-full"><div id="xp-bar" class="progress-bar bg-blue-500"></div></div><span id="xp-text">0%</span></div>
                     <div class="flex items-center gap-2 text-sm"><span class="text-green-400">SALDO:</span><div id="player-balance" class="text-green-400 font-bold">$0.00</div></div>
                 </div>
@@ -85,7 +110,7 @@
             <div id="finanzas-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center text-text-accent-color">LIBRO DE CUENTAS</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><button class="pixel-button green sfx-click" onclick="openModal('income-modal')">+ Ingreso</button><button class="pixel-button red sfx-click" onclick="openModal('expense-modal')">- Egreso</button></div><h3 class="text-lg mb-2">Historial:</h3><div id="transaction-list" class="space-y-3 text-sm max-h-80 overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div></div></div>
             <div id="tienda-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center text-text-accent-color">TIENDA DE DESEOS</h2><div class="carousel-wrapper"><div id="store-carousel" class="carousel-container"></div><div class="carousel-nav"><button class="nav-arrow" onclick="slideStore(-1)"><i data-lucide="arrow-left"></i></button><button class="nav-arrow" onclick="slideStore(1)"><i data-lucide="arrow-right"></i></button></div></div><button class="pixel-button w-full mt-6 sfx-click" onclick="openModal('new-item-modal')">Añadir Objeto</button></div></div>
             <div id="inventario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center text-text-accent-color">INVENTARIO</h2><div id="inventory-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto p-2"></div></div></div>
-            <div id="armario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-6 text-center text-text-accent-color">GUARDARROPA</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg-col-span-1"><h3 class="text-lg mb-4">Planificador</h3><div id="weekly-planner" class="space-y-3"></div></div><div class="lg:col-span-2"><h3 class="text-lg mb-4">Mi Inventario</h3><div id="wardrobe-inventory" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div><button class="pixel-button w-full mt-4 sfx-click" onclick="openModal('add-clothing-modal')">Añadir Prenda</button></div></div></div></div>
+            <div id="armario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-6 text-center text-text-accent-color">GUARDARROPA</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-1"><h3 class="text-lg mb-4">Planificador</h3><div id="weekly-planner" class="space-y-3"></div></div><div class="lg:col-span-2"><h3 class="text-lg mb-4">Mi Inventario</h3><div id="wardrobe-inventory" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div><button class="pixel-button w-full mt-4 sfx-click" onclick="openModal('add-clothing-modal')">Añadir Prenda</button></div></div></div></div>
             <div id="ajustes-tab" class="tab-content">
                 <div class="pixel-box">
                     <h2 class="text-xl mb-6 text-center text-text-accent-color">AJUSTES DE SONIDO</h2>
@@ -116,13 +141,21 @@ let state = {
     transactions: [], 
     storeItems: [], 
     wardrobe: { clothes: [], outfits: {} },
-    audio: { music: null, musicFileName: null }
+    audio: { music: null, musicFileName: null },
+    character: { // NUEVO ESTADO PARA EL PERSONAJE
+        username: "elgatin",
+        avatar: null
+    }
 };
 const DOM = { 
     xpBar: document.getElementById('xp-bar'), xpText: document.getElementById('xp-text'), playerBalance: document.getElementById('player-balance'), missionList: document.getElementById('mission-list'), transactionList: document.getElementById('transaction-list'), storeCarousel: document.getElementById('store-carousel'), inventoryList: document.getElementById('inventory-list'), wardrobeInventory: document.getElementById('wardrobe-inventory'), weeklyPlanner: document.getElementById('weekly-planner'), 
     musicToggleBtn: document.getElementById('music-toggle-btn'), bgMusic: document.getElementById('background-music'), sfxPlayer: document.getElementById('sfx-player'), 
     confirmModal: { el: document.getElementById('confirm-modal'), title: document.getElementById('confirm-title'), message: document.getElementById('confirm-message'), okBtn: document.getElementById('confirm-ok-btn'), cancelBtn: document.getElementById('confirm-cancel-btn') },
-    musicUpload: document.getElementById('music-upload'), musicFileName: document.getElementById('music-file-name')
+    musicUpload: document.getElementById('music-upload'), musicFileName: document.getElementById('music-file-name'),
+    // NUEVOS SELECTORES PARA EL PERSONAJE
+    characterAvatar: document.getElementById('character-avatar'),
+    avatarUpload: document.getElementById('avatar-upload'),
+    characterUsername: document.getElementById('character-username')
 };
 const DEFAULT_MUSIC_URL = 'https://cdn.pixabay.com/download/audio/2022/11/22/audio_2c0d5257bf.mp3?filename=lofi-beat-126488.mp3';
 const SFX_CLICK_URL = 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_23b3713a86.mp3?filename=select-sound-121244.mp3';
@@ -131,20 +164,29 @@ const UMBRAL_COMPRA_GRANDE = 0.30;
 
 function saveState() {
     try {
-        localStorage.setItem('miVidaRpgState_v14', JSON.stringify(state));
+        localStorage.setItem('miVidaRpgState_v15', JSON.stringify(state));
     } catch (e) {
         console.error("Error al guardar el estado. ¿Navegador en modo privado?", e);
     }
 }
 function loadState() { 
-    const s = localStorage.getItem('miVidaRpgState_v14'); 
+    const s = localStorage.getItem('miVidaRpgState_v15'); 
     if(s) { 
         state = JSON.parse(s); 
         if (!state.audio) { state.audio = { music: null, musicFileName: null }; }
+        if (!state.character) { state.character = { username: "elgatin", avatar: null }; }
     } 
 }
 
-function render() { renderStats(); renderMissions(); renderTransactions(); renderStore(); renderInventory(); renderWardrobe(); renderAjustes(); lucide.createIcons(); }
+function render() { renderCharacter(); renderStats(); renderMissions(); renderTransactions(); renderStore(); renderInventory(); renderWardrobe(); renderAjustes(); lucide.createIcons(); }
+
+function renderCharacter() {
+    DOM.characterUsername.textContent = state.character.username;
+    if (state.character.avatar) {
+        DOM.characterAvatar.src = state.character.avatar;
+    }
+}
+
 function renderStats() { DOM.playerBalance.textContent = `$${state.balance.toFixed(2)}`; updateXpBar(); }
 function updateXpBar() { const total = state.missions.length; const completed = state.missions.filter(m => m.completed).length; const perc = total === 0 ? 0 : Math.round((completed / total) * 100); DOM.xpBar.style.width = `${perc}%`; DOM.xpText.textContent = `${perc}%`; }
 
@@ -181,7 +223,7 @@ function toggleMusic() {
         DOM.bgMusic.play().then(() => {
             icon.setAttribute('data-lucide', 'volume-2');
             lucide.createIcons();
-        }).catch(e => {});
+        }).catch(e => console.log("El usuario debe interactuar para iniciar la música."));
     } else {
         DOM.bgMusic.pause();
         icon.setAttribute('data-lucide', 'volume-x');
@@ -191,17 +233,14 @@ function toggleMusic() {
 function handleFileUpload(file, callback) {
     if (!file) return;
     if (file.size > 10 * 1024 * 1024) { 
-        DOM.musicFileName.textContent = "Error: Archivo muy grande (máx 10MB)";
-        DOM.musicFileName.style.color = 'var(--danger-color)';
+        alert("Error: Archivo muy grande (máx 10MB)");
         return;
     }
-    DOM.musicFileName.style.color = 'inherit';
     const reader = new FileReader();
     reader.onload = (e) => { callback(e.target.result); };
     reader.readAsDataURL(file);
 }
 
-// **AQUÍ ESTÁ LA CORRECCIÓN. LAS FUNCIONES VUELVEN A SER GLOBALES**
 window.addMission = function() { const i = document.getElementById('new-mission-input'); const t = i.value.trim(); if (t) { state.missions.push({ text: t, completed: false }); i.value = ''; saveState(); render(); } }
 window.toggleMission = function(index) { state.missions[index].completed = !state.missions[index].completed; saveState(); render(); }
 window.addTransaction = function(type) { const aEl = document.getElementById(`${type}-amount`); const dEl = type === 'income' ? document.getElementById('income-source') : document.getElementById('expense-description'); const a = parseFloat(aEl.value); const d = dEl.value.trim(); if (!a || a <= 0 || !d) return; if (type === 'expense' && a > state.balance) return; state.balance += type === 'income' ? a : -a; state.transactions.push({ type, amount: a, description: d, date: new Date().toLocaleDateString('es-MX') }); aEl.value = ''; dEl.value = ''; closeModal('income-modal'); saveState(); render(); }
@@ -229,10 +268,15 @@ window.showTab = function(tabId) { document.querySelectorAll('.tab-content').for
 window.openModal = function(id) { document.getElementById(id).classList.remove('hidden'); }
 window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); }
 window.slideStore = function(dir) { const c=DOM.storeCarousel; const slide=c.querySelector('.carousel-slide'); if(!slide) return; const scrollAmount=slide.offsetWidth+20; c.scrollBy({left:scrollAmount*dir,behavior:'smooth'}); }
-// Y el resto de funciones de Armario
-window.renderWardrobe = function() { /* ... */ }; window.addWardrobeItem = function() { /* ... */ }; window.removeWardrobeItem = function(id){ /* ... */ }; window.openOutfitPlanner = function(day){ /* ... */ }; window.toggleOutfitItem = function(day,id){ /* ... */ }; window.clearOutfit = function(day){ /* ... */ };
 window.renderMissions = function() { DOM.missionList.innerHTML = state.missions.length === 0 ? '<p class="text-center opacity-50">No hay misiones.</p>' : state.missions.map((m, i) => `<div class="p-3 border-2 ${m.completed ? 'border-gray-600 opacity-50' : 'border-gray-400'} flex items-center"><input type="checkbox" id="mission-${i}" class="pixel-checkbox" onchange="toggleMission(${i})" ${m.completed ? 'checked' : ''}><label for="mission-${i}" class="${m.completed ? 'line-through' : ''}">${m.text}</label></div>`).join(''); }
 window.renderTransactions = function() { DOM.transactionList.innerHTML = state.transactions.length === 0 ? '<p class="text-center opacity-50">Sin transacciones.</p>' : [...state.transactions].reverse().map(tx => `<div class="p-2 border-b-2 border-dashed border-gray-700"><div class="flex justify-between items-center"><span>${tx.description}</span><span class="font-bold ${tx.type === 'income' ? 'text-green-400' : 'text-red-400'}">${tx.type === 'income' ? '+' : '-'}$${tx.amount.toFixed(2)}</span></div><div class="text-xs opacity-60 text-right">${tx.date}</div></div>`).join(''); }
+window.renderWardrobe = function() { /* ...código de renderizado de armario... */ };
+window.addWardrobeItem = function() { /* ...código para añadir prenda... */ };
+window.removeWardrobeItem = function(id){ /* ...código para remover prenda... */ };
+window.openOutfitPlanner = function(day){ /* ...código para abrir planificador... */ };
+window.toggleOutfitItem = function(day,id){ /* ...código para seleccionar prenda... */ };
+window.clearOutfit = function(day){ /* ...código para limpiar outfit... */ };
+
 
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
@@ -252,6 +296,14 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.setAttribute('data-lucide', 'volume-2');
             lucide.createIcons();
             renderAjustes();
+        });
+    });
+    DOM.avatarUpload.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        handleFileUpload(file, (data) => {
+            state.character.avatar = data;
+            saveState();
+            renderCharacter();
         });
     });
     document.body.addEventListener('click', function(e) {
