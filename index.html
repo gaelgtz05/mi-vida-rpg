@@ -64,8 +64,6 @@
         .nav-icon-button i { width: 28px; height: 28px; stroke-width: 2.5; }
         .nav-icon-button.active i { stroke: var(--accent-color); }
         main { padding-bottom: 20px; }
-
-        /* --- NUEVOS ESTILOS PARA FILTROS --- */
         .filter-dropdown { position: relative; }
         .filter-dropdown-button { background-color: var(--bg-color); border: 2px solid var(--border-color); padding: 4px 8px; font-size: 0.7rem; display: flex; align-items: center; justify-content: space-between; width: 100%; }
         .filter-dropdown-list { position: absolute; top: 100%; left: 0; right: 0; background-color: var(--main-color); border: 2px solid var(--border-color); z-index: 10; max-height: 200px; overflow-y: auto; }
@@ -98,44 +96,19 @@
 
         <main>
             <div id="misiones-tab" class="tab-content active"><div class="pixel-box"><h2 class="text-xl mb-4 text-center">MISIONES DIARIAS</h2><div id="mission-list" class="space-y-4 mb-6 max-h-96 overflow-y-auto p-2"></div><div class="flex flex-col md:flex-row gap-4"><input type="text" id="new-mission-input" placeholder="Nueva misión..."><button class="pixel-button" onclick="addMission()">Aceptar</button></div></div></div>
-            <div id="finanzas-tab" class="tab-content">
-                <div class="pixel-box">
-                    <h2 class="text-xl mb-4 text-center">LIBRO DE CUENTAS</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><button class="pixel-button green" onclick="openModal('income-modal')">+ Ingreso</button><button class="pixel-button red" onclick="openModal('expense-modal')">- Egreso</button></div>
-                    <h3 class="text-lg mb-2">Historial:</h3>
-                    <div id="transaction-filters" class="filter-dropdown mb-4"></div>
-                    <div id="transaction-list" class="space-y-3 text-sm max-h-80 overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div>
-                </div>
-            </div>
+            <div id="finanzas-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center">LIBRO DE CUENTAS</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><button class="pixel-button green" onclick="openModal('income-modal')">+ Ingreso</button><button class="pixel-button red" onclick="openModal('expense-modal')">- Egreso</button></div><h3 class="text-lg mb-2">Historial:</h3><div id="transaction-filters" class="filter-dropdown mb-4"></div><div id="transaction-list" class="space-y-3 text-sm max-h-80 overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div></div></div>
             <div id="tienda-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center">TIENDA DE DESEOS</h2><div class="carousel-wrapper"><div id="store-carousel" class="carousel-container"></div><div class="carousel-nav"><button class="nav-arrow" onclick="slideStore(-1)"><i data-lucide="arrow-left"></i></button><button class="nav-arrow" onclick="slideStore(1)"><i data-lucide="arrow-right"></i></button></div></div><button class="pixel-button w-full mt-6" onclick="openModal('new-item-modal')">Añadir Objeto</button></div></div>
             <div id="inventario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-4 text-center">INVENTARIO</h2><div id="inventory-list" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto p-2"></div></div></div>
             <div id="armario-tab" class="tab-content"><div class="pixel-box"><h2 class="text-xl mb-6 text-center">GUARDARROPA</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-1"><h3 class="text-lg mb-4">Planificador</h3><div id="weekly-planner" class="space-y-3"></div></div><div class="lg:col-span-2"><h3 class="text-lg mb-4">Mi Inventario</h3><div id="wardrobe-inventory" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[400px] overflow-y-auto border-2 border-dashed border-gray-600 p-2"></div><button class="pixel-button w-full mt-4" onclick="openModal('add-clothing-modal')">Añadir Prenda</button></div></div></div></div>
-            <div id="ahorro-tab" class="tab-content">
-                <div class="pixel-box text-center">
-                    <h2 class="text-xl mb-4 text-text-accent-color">MI AHORRO</h2>
-                    <div class="bg-gray-900 p-6 border-4 border-dashed border-gray-600">
-                        <p class="text-lg mb-2 text-green-400">Total Ahorrado:</p>
-                        <p id="savings-balance" class="text-4xl font-bold text-green-300">$0.00</p>
-                    </div>
-                </div>
-            </div>
+            <div id="ahorro-tab" class="tab-content"><div class="pixel-box text-center"><h2 class="text-xl mb-4 text-text-accent-color">MI AHORRO</h2><div class="bg-gray-900 p-6 border-4 border-dashed border-gray-600"><p class="text-lg mb-2 text-green-400">Total Ahorrado:</p><p id="savings-balance" class="text-4xl font-bold text-green-300">$0.00</p></div></div></div>
         </main>
     </div>
     
     <div id="income-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Registrar Ingreso</h3><input type="number" id="income-amount" placeholder="Monto ($)" class="mb-3"><input type="text" id="income-source" placeholder="Origen" class="mb-3"><select id="income-account" class="mb-4"><option value="card">Tarjeta</option><option value="cash">Efectivo</option></select><div class="flex justify-end gap-3"><button class="pixel-button gray" onclick="closeModal('income-modal')">Cerrar</button><button class="pixel-button green" onclick="addTransaction('income')">Registrar</button></div></div></div>
-    <div id="expense-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden">
-        <div class="pixel-box w-full max-w-md">
-            <h3 class="text-lg mb-4">Registrar Egreso</h3>
-            <input type="number" id="expense-amount" placeholder="Monto ($)" class="mb-3">
-            <select id="expense-account" class="mb-3"><option value="card">Tarjeta</option><option value="cash">Efectivo</option></select>
-            <select id="expense-category" class="mb-3"><option value="Comida">Comida</option><option value="Ropa">Ropa</option><option value="Gasolina">Gasolina</option><option value="Suscripciones">Suscripciones</option><option value="Transporte">Transporte</option><option value="Hogar">Hogar</option><option value="Salud">Salud</option><option value="Entretenimiento">Entretenimiento</option><option value="Otro">Otro</option></select>
-            <input type="text" id="expense-other-description" placeholder="Descripción específica" class="mb-4 hidden">
-            <div class="flex justify-end gap-3"><button class="pixel-button gray" onclick="closeModal('expense-modal')">Cerrar</button><button class="pixel-button red" onclick="addTransaction('expense')">Registrar</button></div>
-        </div>
-    </div>
+    <div id="expense-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Registrar Egreso</h3><input type="number" id="expense-amount" placeholder="Monto ($)" class="mb-3"><select id="expense-account" class="mb-3"><option value="card">Tarjeta</option><option value="cash">Efectivo</option></select><select id="expense-category" class="mb-3"><option value="Comida">Comida</option><option value="Ropa">Ropa</option><option value="Gasolina">Gasolina</option><option value="Suscripciones">Suscripciones</option><option value="Transporte">Transporte</option><option value="Hogar">Hogar</option><option value="Salud">Salud</option><option value="Entretenimiento">Entretenimiento</option><option value="Otro">Otro</option></select><input type="text" id="expense-other-description" placeholder="Descripción específica" class="mb-4 hidden"><div class="flex justify-end gap-3"><button class="pixel-button gray" onclick="closeModal('expense-modal')">Cerrar</button><button class="pixel-button red" onclick="addTransaction('expense')">Registrar</button></div></div></div>
     <div id="new-item-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Nuevo Objeto</h3><input type="text" id="item-name" placeholder="Nombre" class="mb-3"><input type="number" id="item-price" placeholder="Precio ($)" class="mb-3"><label class="text-sm mb-2 block">Imagen (PNG, JPG):</label><input type="file" id="item-image-upload" accept="image/png, image/jpeg" class="mb-4"><div class="flex justify-end gap-3"><button class="pixel-button gray" onclick="closeModal('new-item-modal')">Cerrar</button><button class="pixel-button" onclick="addStoreItem()">Añadir</button></div></div></div>
     <div id="confirm-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md text-center"><h3 id="confirm-title" class="text-lg mb-4"></h3><p id="confirm-message" class="mb-6"></p><div class="flex justify-center gap-4"><button id="confirm-cancel-btn" class="pixel-button gray">Cancelar</button><button id="confirm-ok-btn" class="pixel-button">Confirmar</button></div></div></div>
-    <div id="add-clothing-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Añadir Prenda</h3><input type="text" id="clothing-name" placeholder="Nombre" class="mb-3"><input type="text" id="clothing-url" placeholder="URL de imagen" class="mb-4"><div class="flex justify-end gap-3"><button class="pixel-button gray" onclick="closeModal('add-clothing-modal')">Cerrar</button><button class="pixel-button" onclick="addWardrobeItem()">Añadir</button></div></div></div>
+    <div id="add-clothing-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-md"><h3 class="text-lg mb-4">Añadir Prenda</h3><input type="text" id="clothing-name" placeholder="Nombre" class="mb-3"><label class="text-sm mb-2 block">Imagen (PNG, JPG):</label><input type="file" id="clothing-image-upload" accept="image/png, image/jpeg" class="mb-4"><div class="flex justify-end gap-3"><button class="pixel-button gray" onclick="closeModal('add-clothing-modal')">Cerrar</button><button class="pixel-button" onclick="addWardrobeItem()">Añadir</button></div></div></div>
     <div id="plan-outfit-modal" class="modal-backdrop fixed inset-0 flex items-center justify-center p-4 z-50 hidden"><div class="pixel-box w-full max-w-2xl"><h3 class="text-lg mb-4" id="plan-outfit-title">Planificar Outfit</h3><div id="plan-outfit-inventory" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 max-h-80 overflow-y-auto border-2 border-dashed border-gray-600 p-2 mb-4"></div><div class="flex justify-end gap-3"><button class="pixel-button gray" onclick="closeModal('plan-outfit-modal')">Cerrar</button></div></div></div>
 
     <nav id="bottom-nav">
@@ -150,10 +123,7 @@
 <script>
 let state = { 
     balance: { cash: 0, card: 0 }, 
-    savingsBalance: 0,
-    missions: [], 
-    transactions: [], 
-    storeItems: [], 
+    savingsBalance: 0, missions: [], transactions: [], storeItems: [], 
     wardrobe: { clothes: [], outfits: {} },
     character: { username: "elgatin", avatar: null },
     financialFilter: 'Todos'
@@ -171,14 +141,13 @@ const DOM = {
     bottomNav: document.getElementById('bottom-nav'),
     expenseCategory: document.getElementById('expense-category'), expenseOtherDescription: document.getElementById('expense-other-description')
 };
-
 const INGRESOS = { SENCILLO: 350, AVANZADO: 550 };
 const UMBRAL_COMPRA_GRANDE = 0.30;
-const AHORRO_PORCENTAJE = 0.20; // 20%
+const AHORRO_PORCENTAJE = 0.20;
 const CATEGORIAS_EGRESO = ['Comida', 'Ropa', 'Gasolina', 'Suscripciones', 'Transporte', 'Hogar', 'Salud', 'Entretenimiento', 'Otro'];
 
-function saveState() { try { localStorage.setItem('miVidaRpgState_v18', JSON.stringify(state)); } catch (e) { console.error("Error al guardar:", e); } }
-function loadState() { const s = localStorage.getItem('miVidaRpgState_v18'); if(s){ state = JSON.parse(s); if(!state.character){state.character={username:"elgatin",avatar:null};} if(state.savingsBalance === undefined){state.savingsBalance=0;} if(!state.financialFilter){state.financialFilter='Todos';} if(!state.balance.cash){state.balance={cash:state.balance || 0, card:0};} } }
+function saveState() { try { localStorage.setItem('miVidaRpgState_v19', JSON.stringify(state)); } catch (e) { console.error("Error al guardar:", e); } }
+function loadState() { const s = localStorage.getItem('miVidaRpgState_v19'); if(s){ try { state = JSON.parse(s); if(!state.character){state.character={username:"elgatin",avatar:null};} if(state.savingsBalance === undefined){state.savingsBalance=0;} if(!state.financialFilter){state.financialFilter='Todos';} if(!state.balance.cash && state.balance.cash !== 0){state.balance={cash:state.balance || 0, card:0};} } catch(e){ console.error("Error al cargar estado, reseteando.", e); state = { balance: { cash: 0, card: 0 }, savingsBalance: 0, missions: [], transactions: [], storeItems: [], wardrobe: { clothes: [], outfits: {} }, character: { username: "elgatin", avatar: null }, financialFilter: 'Todos' }; } } }
 
 function render() { renderCharacter(); renderStats(); renderMissions(); renderTransactions(); renderStore(); renderInventory(); renderWardrobe(); renderAhorro(); lucide.createIcons(); }
 function renderCharacter() { DOM.characterUsername.textContent = state.character.username; DOM.characterAvatar.src = state.character.avatar || "https://placehold.co/80x80/161b22/c9d1d9?text=?"; }
@@ -197,11 +166,8 @@ function renderTransactions() {
     `;
 
     let filteredTransactions = state.transactions;
-    if (state.financialFilter === 'Ingresos') {
-        filteredTransactions = state.transactions.filter(t => t.type === 'income');
-    } else if (state.financialFilter !== 'Todos') {
-        filteredTransactions = state.transactions.filter(t => t.category === state.financialFilter);
-    }
+    if (state.financialFilter === 'Ingresos') { filteredTransactions = state.transactions.filter(t => t.type === 'income'); } 
+    else if (state.financialFilter !== 'Todos') { filteredTransactions = state.transactions.filter(t => t.category === state.financialFilter); }
     
     DOM.transactionList.innerHTML = filteredTransactions.length === 0 ? '<p class="text-center opacity-50">Sin transacciones para este filtro.</p>' : [...filteredTransactions].reverse().map(tx => {
         const isIncome = tx.type === 'income';
@@ -220,26 +186,20 @@ function handleFileUpload(file, callback) { if(!file)return; if(file.size>10*102
 window.addMission = function() { const i=document.getElementById('new-mission-input'); const t=i.value.trim(); if(t){state.missions.push({text:t,completed:false});i.value='';saveState();render();} }
 window.toggleMission = function(index) { state.missions[index].completed = !state.missions[index].completed; saveState();render(); }
 window.addTransaction = function(type) {
-    const amountEl = document.getElementById(`${type}-amount`);
-    const amount = parseFloat(amountEl.value);
+    const amountEl = document.getElementById(`${type}-amount`); const amount = parseFloat(amountEl.value);
     if (!amount || amount <= 0) return;
 
     if (type === 'income') {
-        const sourceEl = document.getElementById('income-source');
-        const account = document.getElementById('income-account').value;
-        const source = sourceEl.value.trim();
+        const sourceEl = document.getElementById('income-source'); const account = document.getElementById('income-account').value; const source = sourceEl.value.trim();
         if (!source) return;
-
         const savings = amount * AHORRO_PORCENTAJE;
         state.savingsBalance += savings;
         state.balance[account] += (amount - savings);
-        
         state.transactions.push({ type: 'income', amount, description: source, date: new Date().toLocaleDateString('es-MX'), account });
         sourceEl.value = '';
-    } else { // Expense
+    } else {
         const account = document.getElementById('expense-account').value;
         if (amount > state.balance[account]) { alert(`Saldo insuficiente en ${account}.`); return; }
-        
         const category = DOM.expenseCategory.value;
         let description = null;
         if (category === 'Otro') {
@@ -248,17 +208,12 @@ window.addTransaction = function(type) {
         }
         state.balance[account] -= amount;
         state.transactions.push({ type: 'expense', amount, category, description, date: new Date().toLocaleDateString('es-MX'), account });
-        DOM.expenseOtherDescription.value = '';
-        DOM.expenseOtherDescription.classList.add('hidden');
-        DOM.expenseCategory.value = 'Comida';
+        DOM.expenseOtherDescription.value = ''; DOM.expenseOtherDescription.classList.add('hidden'); DOM.expenseCategory.value = 'Comida';
     }
-    
-    amountEl.value = '';
-    closeModal(`${type}-modal`);
-    saveState();
-    render();
+    amountEl.value = ''; closeModal(`${type}-modal`); saveState(); render();
 }
-window.addStoreItem = function() { /* ... sin cambios ... */ }
+window.addStoreItem = function() { const nEl=document.getElementById('item-name'), pEl=document.getElementById('item-price'), iEl=document.getElementById('item-image-upload'); const n=nEl.value.trim(), p=parseFloat(pEl.value), f=iEl.files[0]; if(!n||!p||p<=0)return; const process=(d)=>{state.storeItems.push({id:`item_${Date.now()}`,name:n,price:p,imageData:d,purchased:false});nEl.value='';pEl.value='';iEl.value='';closeModal('new-item-modal');saveState();render();}; if(f){const r=new FileReader();r.onload=(e)=>process(e.target.result);r.readAsDataURL(f);}else{process(null);} }
+window.addWardrobeItem = function() { const nEl = document.getElementById('clothing-name'); const iEl = document.getElementById('clothing-image-upload'); const n = nEl.value.trim(); const f = iEl.files[0]; if (!n || !f) { alert("Por favor, añade un nombre y una imagen."); return; } handleFileUpload(f, (data) => { state.wardrobe.clothes.push({ id: `cloth_${Date.now()}`, name: n, imageData: data }); nEl.value = ''; iEl.value = ''; closeModal('add-clothing-modal'); saveState(); render(); }); }
 window.confirmPurchase = function(index) { /* ... sin cambios ... */ }
 function buyStoreItem(index) { /* ... sin cambios ... */ }
 function showConfirmation(title, message, btnClass, callback) { /* ... sin cambios ... */ }
@@ -266,16 +221,8 @@ window.showTab = function(tabId) { document.querySelectorAll('.tab-content').for
 window.openModal = function(id) { document.getElementById(id).classList.remove('hidden'); }
 window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); }
 window.slideStore = function(dir) { /* ... sin cambios ... */ }
-window.setFinancialFilter = function(filter) { 
-    state.financialFilter = filter; 
-    renderTransactions(); 
-    const filterList = document.getElementById('filter-list');
-    if (filterList) filterList.classList.add('hidden');
-}
-window.toggleFilterDropdown = function() {
-    const filterList = document.getElementById('filter-list');
-    if (filterList) filterList.classList.toggle('hidden');
-}
+window.setFinancialFilter = function(filter) { state.financialFilter = filter; renderTransactions(); const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.add('hidden'); }
+window.toggleFilterDropdown = function() { const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.toggle('hidden'); }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
@@ -283,14 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
     showTab('misiones');
     
     DOM.avatarUpload.addEventListener('change', (e) => { handleFileUpload(e.target.files[0], (data) => { state.character.avatar = data; saveState(); renderCharacter(); }); });
-    DOM.expenseCategory.addEventListener('change', (e) => {
-        if (e.target.value === 'Otro') {
-            DOM.expenseOtherDescription.classList.remove('hidden');
-        } else {
-            DOM.expenseOtherDescription.classList.add('hidden');
-        }
-    });
+    DOM.expenseCategory.addEventListener('change', (e) => { if (e.target.value === 'Otro') { DOM.expenseOtherDescription.classList.remove('hidden'); } else { DOM.expenseOtherDescription.classList.add('hidden'); } });
 });
 </script>
 </body>
 </html>
+
