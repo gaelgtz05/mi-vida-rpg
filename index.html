@@ -143,7 +143,6 @@ const DOM = {
     bottomNav: document.getElementById('bottom-nav'),
     expenseCategory: document.getElementById('expense-category'), expenseOtherDescription: document.getElementById('expense-other-description')
 };
-
 const INGRESOS = { SENCILLO: 350, AVANZADO: 550 };
 const UMBRAL_COMPRA_GRANDE = 0.30;
 const AHORRO_PORCENTAJE = 0.20;
@@ -153,17 +152,17 @@ function saveState() {
     try {
         localStorage.setItem('miVidaRpgState_vFINAL', JSON.stringify(state)); 
     } catch (e) {
-        console.error("Error al guardar estado:", e);
+        console.error("Error al guardar:", e);
     }
 }
 function loadState() { 
-    const savedStateJSON = localStorage.getItem('miVidaRpgState_vFINAL'); 
-    if(savedStateJSON){ 
+    const s = localStorage.getItem('miVidaRpgState_vFINAL'); 
+    if(s){ 
         try { 
-            const loadedState = JSON.parse(savedStateJSON); 
+            let loadedState = JSON.parse(s); 
             state = { ...initialState, ...loadedState };
         } catch(e){ 
-            console.error("Error al cargar estado, se usará estado por defecto.", e); 
+            console.error("Error al cargar estado, se usará estado inicial.", e); 
             state = { ...initialState };
         } 
     } else {
@@ -241,7 +240,7 @@ window.addTransaction = function(type) {
     amountEl.value = ''; closeModal(`${type}-modal`); saveState(); render();
 }
 window.addStoreItem = function() { const nEl=document.getElementById('item-name'), pEl=document.getElementById('item-price'), iEl=document.getElementById('item-image-upload'); const n=nEl.value.trim(), p=parseFloat(pEl.value), f=iEl.files[0]; if(!n||!p||p<=0)return; const process=(d)=>{state.storeItems.push({id:`item_${Date.now()}`,name:n,price:p,imageData:d,purchased:false});nEl.value='';pEl.value='';iEl.value='';closeModal('new-item-modal');saveState();render();}; if(f){const r=new FileReader();r.onload=(e)=>process(e.target.result);r.readAsDataURL(f);}else{process(null);} }
-window.addWardrobeItem = function() { const nEl = document.getElementById('clothing-name'); const iEl = document.getElementById('clothing-image-upload'); const n = nEl.value.trim(); const f = iEl.files[0]; if (!n || !f) { alert("Por favor, añade un nombre y una imagen."); return; } handleFileUpload(f, (data) => { if(!state.wardrobe.clothes) state.wardrobe.clothes = []; state.wardrobe.clothes.push({ id: `cloth_${Date.now()}`, name: n, imageData: data }); nEl.value = ''; iEl.value = ''; closeModal('add-clothing-modal'); saveState(); render(); }); }
+window.addWardrobeItem = function() { const nEl = document.getElementById('clothing-name'); const iEl = document.getElementById('clothing-image-upload'); const n = nEl.value.trim(); const f = iEl.files[0]; if (!n || !f) { alert("Añade nombre e imagen."); return; } handleFileUpload(f, (data) => { if(!state.wardrobe.clothes) state.wardrobe.clothes = []; state.wardrobe.clothes.push({ id: `cloth_${Date.now()}`, name: n, imageData: data }); nEl.value = ''; iEl.value = ''; closeModal('add-clothing-modal'); saveState(); render(); }); }
 window.removeWardrobeItem = function(id) { state.wardrobe.clothes = state.wardrobe.clothes.filter(i => i.id !== id); saveState(); render(); }
 window.confirmPurchase = function(index) {
     const item = state.storeItems[index];
@@ -271,7 +270,7 @@ window.showTab = function(tabId) { document.querySelectorAll('.tab-content').for
 window.openModal = function(id) { document.getElementById(id).classList.remove('hidden'); }
 window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); }
 window.slideStore = function(dir) { const c=DOM.storeCarousel; const slide=c.querySelector('.carousel-slide'); if(!slide) return; const scrollAmount=slide.offsetWidth+20; c.scrollBy({left:scrollAmount*dir,behavior:'smooth'}); }
-window.setFinancialFilter = function(filter) { state.financialFilter = filter; render(); const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.add('hidden'); }
+window.setFinancialFilter = function(filter) { state.financialFilter = filter; renderTransactions(); const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.add('hidden'); }
 window.toggleFilterDropdown = function() { const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.toggle('hidden'); }
 window.openOutfitPlanner = function(day) { /* ...código de planificador... */ };
 window.toggleOutfitItem = function(day, itemId) { /* ...código de planificador... */ };
@@ -288,3 +287,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
