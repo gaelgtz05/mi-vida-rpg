@@ -121,7 +121,15 @@
     </nav>
 
 <script>
-let state = {};
+const initialState = { 
+    balance: { cash: 0, card: 0 }, 
+    savingsBalance: 0, missions: [], transactions: [], storeItems: [], 
+    wardrobe: { clothes: [], outfits: {} },
+    character: { username: "elgatin", avatar: null },
+    financialFilter: 'Todos'
+};
+let state = { ...initialState };
+
 const DOM = { 
     xpBar: document.getElementById('xp-bar'), xpText: document.getElementById('xp-text'), 
     cashBalance: document.getElementById('cash-balance'), cardBalance: document.getElementById('card-balance'), 
@@ -136,14 +144,6 @@ const DOM = {
     expenseCategory: document.getElementById('expense-category'), expenseOtherDescription: document.getElementById('expense-other-description')
 };
 
-const initialState = {
-    balance: { cash: 0, card: 0 }, 
-    savingsBalance: 0, missions: [], transactions: [], storeItems: [], 
-    wardrobe: { clothes: [], outfits: {} },
-    character: { username: "elgatin", avatar: null },
-    financialFilter: 'Todos'
-};
-
 const INGRESOS = { SENCILLO: 350, AVANZADO: 550 };
 const UMBRAL_COMPRA_GRANDE = 0.30;
 const AHORRO_PORCENTAJE = 0.20;
@@ -151,19 +151,19 @@ const CATEGORIAS_EGRESO = ['Comida', 'Ropa', 'Gasolina', 'Suscripciones', 'Trans
 
 function saveState() { 
     try {
-        localStorage.setItem('miVidaRpgState_v23', JSON.stringify(state)); 
+        localStorage.setItem('miVidaRpgState_vFINAL', JSON.stringify(state)); 
     } catch (e) {
         console.error("Error al guardar estado:", e);
     }
 }
 function loadState() { 
-    const s = localStorage.getItem('miVidaRpgState_v23'); 
-    if(s){ 
+    const savedStateJSON = localStorage.getItem('miVidaRpgState_vFINAL'); 
+    if(savedStateJSON){ 
         try { 
-            let loadedState = JSON.parse(s); 
+            const loadedState = JSON.parse(savedStateJSON); 
             state = { ...initialState, ...loadedState };
         } catch(e){ 
-            console.error("Error al cargar estado, usando estado inicial.", e); 
+            console.error("Error al cargar estado, se usará estado por defecto.", e); 
             state = { ...initialState };
         } 
     } else {
@@ -271,8 +271,11 @@ window.showTab = function(tabId) { document.querySelectorAll('.tab-content').for
 window.openModal = function(id) { document.getElementById(id).classList.remove('hidden'); }
 window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); }
 window.slideStore = function(dir) { const c=DOM.storeCarousel; const slide=c.querySelector('.carousel-slide'); if(!slide) return; const scrollAmount=slide.offsetWidth+20; c.scrollBy({left:scrollAmount*dir,behavior:'smooth'}); }
-window.setFinancialFilter = function(filter) { state.financialFilter = filter; renderTransactions(); const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.add('hidden'); }
+window.setFinancialFilter = function(filter) { state.financialFilter = filter; render(); const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.add('hidden'); }
 window.toggleFilterDropdown = function() { const filterList = document.getElementById('filter-list'); if (filterList) filterList.classList.toggle('hidden'); }
+window.openOutfitPlanner = function(day) { /* ...código de planificador... */ };
+window.toggleOutfitItem = function(day, itemId) { /* ...código de planificador... */ };
+window.clearOutfit = function(day) { /* ...código de planificador... */ };
 
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
@@ -285,4 +288,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
