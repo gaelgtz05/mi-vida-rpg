@@ -149,27 +149,40 @@ const UMBRAL_COMPRA_GRANDE = 0.30;
 const AHORRO_PORCENTAJE = 0.20;
 const CATEGORIAS_EGRESO = ['Comida', 'Ropa', 'Gasolina', 'Suscripciones', 'Transporte', 'Hogar', 'Salud', 'Entretenimiento', 'Otro'];
 
-function saveState() { 
+// ==================================================================
+// == NUEVAS FUNCIONES DE GUARDADO Y CARGA - ¡LA SOLUCIÓN! ==
+// ==================================================================
+
+function saveState() {
     try {
-        localStorage.setItem('miVidaRpgState_v23_final', JSON.stringify(state)); 
+        localStorage.setItem('miVidaRpgState_v23_final', JSON.stringify(state));
     } catch (e) {
         console.error("Error al guardar estado:", e);
+        // Esta alerta te avisará si el navegador bloquea el guardado.
+        alert("¡Atención! No se pudo guardar tu progreso. El navegador está bloqueando el guardado. Esto es común en Safari al abrir un archivo local. Intenta usar un servicio como CodePen para que funcione correctamente.");
     }
 }
-function loadState() { 
-    const s = localStorage.getItem('miVidaRpgState_v23_final'); 
-    if(s){ 
-        try { 
-            let loadedState = JSON.parse(s); 
+
+function loadState() {
+    const s = localStorage.getItem('miVidaRpgState_v23_final');
+    if(s){
+        try {
+            let loadedState = JSON.parse(s);
             state = { ...initialState, ...loadedState };
-        } catch(e){ 
-            console.error("Error al cargar estado, se usará estado inicial.", e); 
+        } catch(e) {
+            console.error("Error al cargar estado, se usará estado inicial.", e);
+            // Esta alerta te avisará si los datos guardados están dañados.
+            alert("¡Atención! Se encontró un error en tus datos guardados. Se reiniciará el progreso para evitar problemas.");
             state = { ...initialState };
-        } 
+        }
     } else {
         state = { ...initialState };
     }
 }
+
+// ==================================================================
+// == EL RESTO DEL CÓDIGO PERMANECE IGUAL ==
+// ==================================================================
 
 function render() { renderCharacter(); renderStats(); renderMissions(); renderTransactions(); renderStore(); renderInventory(); renderWardrobe(); renderAhorro(); lucide.createIcons(); }
 function renderCharacter() { DOM.characterUsername.textContent = state.character.username; DOM.characterAvatar.src = state.character.avatar || "https://placehold.co/80x80/161b22/c9d1d9?text=?"; }
@@ -288,4 +301,3 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
-
