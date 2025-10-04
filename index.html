@@ -72,7 +72,6 @@
     </style>
 </head>
 <body class="p-4 md:p-8">
-
     <div class="container mx-auto max-w-5xl">
         <header class="pixel-box mb-8">
             <h1 class="text-2xl md:text-3xl text-text-accent-color text-center mb-4">MI VIDA RPG</h1>
@@ -147,8 +146,8 @@ const UMBRAL_COMPRA_GRANDE = 0.30;
 const AHORRO_PORCENTAJE = 0.20;
 const CATEGORIAS_EGRESO = ['Comida', 'Ropa', 'Gasolina', 'Suscripciones', 'Transporte', 'Hogar', 'Salud', 'Entretenimiento', 'Otro'];
 
-function saveState() { try { localStorage.setItem('miVidaRpgState_v21', JSON.stringify(state)); } catch (e) { console.error("Error al guardar:", e); } }
-function loadState() { const s = localStorage.getItem('miVidaRpgState_v21'); if(s){ try { let loadedState = JSON.parse(s); state = { ...state, ...loadedState }; if(!state.balance.cash && state.balance.cash !== 0){state.balance={cash:state.balance || 0, card:0};} } catch(e){ console.error("Error al cargar estado, reseteando.", e); } } }
+function saveState() { try { localStorage.setItem('miVidaRpgState_v22', JSON.stringify(state)); } catch (e) { console.error("Error al guardar:", e); } }
+function loadState() { const s = localStorage.getItem('miVidaRpgState_v22'); if(s){ try { let loadedState = JSON.parse(s); state = { ...state, ...loadedState }; if(!state.balance.cash && state.balance.cash !== 0){state.balance={cash:state.balance || 0, card:0};} } catch(e){ console.error("Error al cargar estado, reseteando.", e); } } }
 
 function render() { renderCharacter(); renderStats(); renderMissions(); renderTransactions(); renderStore(); renderInventory(); renderWardrobe(); renderAhorro(); lucide.createIcons(); }
 function renderCharacter() { DOM.characterUsername.textContent = state.character.username; DOM.characterAvatar.src = state.character.avatar || "https://placehold.co/80x80/161b22/c9d1d9?text=?"; }
@@ -157,18 +156,11 @@ function updateXpBar() { const total=state.missions.length; const completed=stat
 function renderMissions() { DOM.missionList.innerHTML = state.missions.length === 0 ? '<p class="text-center opacity-50">No hay misiones.</p>' : state.missions.map((m, i) => `<div class="p-3 border-2 ${m.completed?'border-gray-600 opacity-50':'border-gray-400'} flex items-center"><input type="checkbox" id="mission-${i}" class="pixel-checkbox" onchange="toggleMission(${i})" ${m.completed?'checked':''}><label for="mission-${i}" class="${m.completed?'line-through':''}">${m.text}</label></div>`).join(''); }
 function renderTransactions() {
     const filters = ['Todos', 'Ingresos', ...CATEGORIAS_EGRESO];
-    DOM.transactionFilters.innerHTML = `
-        <button class="filter-dropdown-button" onclick="toggleFilterDropdown()">
-            <span>${state.financialFilter}</span><i data-lucide="chevron-down" class="w-4 h-4"></i>
-        </button>
-        <div id="filter-list" class="filter-dropdown-list hidden">
-            ${filters.map(f => `<div class="filter-option" onclick="setFinancialFilter('${f}')">${f}</div>`).join('')}
-        </div>
-    `;
+    DOM.transactionFilters.innerHTML = `<button class="filter-dropdown-button" onclick="toggleFilterDropdown()"><span>${state.financialFilter}</span><i data-lucide="chevron-down" class="w-4 h-4"></i></button><div id="filter-list" class="filter-dropdown-list hidden">${filters.map(f => `<div class="filter-option" onclick="setFinancialFilter('${f}')">${f}</div>`).join('')}</div>`;
     let filteredTransactions = state.transactions;
     if (state.financialFilter === 'Ingresos') { filteredTransactions = state.transactions.filter(t => t.type === 'income'); } 
     else if (state.financialFilter !== 'Todos') { filteredTransactions = state.transactions.filter(t => t.category === state.financialFilter); }
-    DOM.transactionList.innerHTML = filteredTransactions.length === 0 ? '<p class="text-center opacity-50">Sin transacciones para este filtro.</p>' : [...filteredTransactions].reverse().map(tx => {
+    DOM.transactionList.innerHTML = filteredTransactions.length === 0 ? '<p class="text-center opacity-50">Sin transacciones.</p>' : [...filteredTransactions].reverse().map(tx => {
         const isIncome = tx.type === 'income';
         const accountLabel = tx.account === 'cash' ? '[Efectivo]' : '[Tarjeta]';
         const description = isIncome ? tx.description : `${tx.category}${tx.description ? ` (${tx.description})` : ''}`;
@@ -194,7 +186,7 @@ function renderStore() {
 function renderInventory() { const purchasedItems = state.storeItems.filter(item => item.purchased); DOM.inventoryList.innerHTML = purchasedItems.length === 0 ? '<p class="text-center opacity-50 col-span-full">Aún no tienes objetos.</p>' : purchasedItems.map(item => `<div class="item-card-minimal"><img src="${item.imageData}" alt="${item.name}" class="item-image mb-2"><h4 class="item-name text-text-accent-color truncate">${item.name}</h4></div>`).join(''); }
 function renderWardrobe() {
     DOM.wardrobeInventory.innerHTML = !state.wardrobe.clothes || state.wardrobe.clothes.length === 0 ? '<p class="text-center opacity-50 col-span-full">Armario vacío.</p>' : state.wardrobe.clothes.map(item => `<div class="relative group item-card-minimal"><img src="${item.imageData}" alt="${item.name}" class="item-image !h-24"><p class="text-xs truncate">${item.name}</p><button onclick="removeWardrobeItem('${item.id}')" class="absolute top-0 right-0 p-1 bg-danger-color/50 rounded-full hidden group-hover:block"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div>`).join('');
-    // El resto de la lógica del planificador de armario
+    // El resto de la lógica del planificador
 }
 function renderAhorro() { DOM.savingsBalance.textContent = `$${state.savingsBalance.toFixed(2)}`; }
 function handleFileUpload(file, callback) { if(!file)return; if(file.size>10*1024*1024){alert("Error: Archivo muy grande (máx 10MB)");return;} const r=new FileReader(); r.onload=(e)=>{callback(e.target.result);}; r.readAsDataURL(file); }
